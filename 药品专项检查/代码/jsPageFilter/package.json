@@ -13,8 +13,14 @@
     "author": "Easy Zhang",
     "license": "Apache-2.0",
     "dependencies": {
+        "lodash": "4.17.15",
         "koa": "^2.8.1",
         "koa-bodyparser": "^3.2.0",
         "koa-router": "^7.0.1"
+    },
+    "devDependencies": {
+        "mocha": "6.2.0",
+        "chai": "4.2.0",
+        "rewire": "4.0.1"
     }
 }
