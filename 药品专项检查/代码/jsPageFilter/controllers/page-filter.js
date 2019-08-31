@@ -1,6 +1,7 @@
 const fs = require('fs')
 const path = require('path')
 const _ = require('lodash')
+
 const WORD_LIB_FILE = 'd:/Works/大嘴鸟/we-watch/药品专项检查/样本/处方药清单_20190829.txt'
 const HTML_PAGE_DB = 'd:/Works/大嘴鸟/we-watch/药品专项检查/样本/pagedb'
 
@@ -46,11 +47,11 @@ function getWebWEnters(root_dir) {
         if (fs.statSync(subDir).isDirectory()) {
             // 是否为web入口的目录
             if (isWebEnterDir(subDir)) {
-                array.push(subDir)
+                array = _.concat(array,subDir)
             }
             else {
                 // 继续发现子目录
-                array.push(getWebWEnters(subDir))
+                array = _.concat(array,getWebWEnters(subDir))
             }
         }
     })
@@ -64,22 +65,18 @@ function isWebEnterDir(dir_name) {
 }
 
 // webzip格式的网站入口
-// 读取这个目录下的所有文件，是否存在和目录名称相同的html文件
-// 如果存在文件，就认为是webzip格式的网站
 function isWebEnterDir4WebZip(dir_name) {
     // 目录必须存在
     if(!fs.existsSync(dir_name)) return false
 
-    let baseDirName = path.dirname(dir_name)
-    let expectFiles = ['renamelist.txt','autorun.inf','webzip.ico','Start.lnk']
-
     // 获得目录下的所有文件
-    let files = fs.readdirSync(baseDirName)
-    // 获得和期望数组的交集
-    let sameFiles = _.intersection(expectFiles,files)
+    let files = fs.readdirSync(dir_name)
+    let htmlFiles = _.filter(files,(f)=>{
+        return f.endsWith('.html')
+    })
 
-    // 和期望数组比较
-    return _.isEqual(expectFiles,sameFiles)
+    // 只有一个html文件
+    return htmlFiles.length === 1
 }
 
 module.exports = {

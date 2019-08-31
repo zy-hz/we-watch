@@ -4,9 +4,13 @@ const lib = require("rewire")('../controllers/page-filter')
 const beginFilter = lib.__get__('beginFilter')
 const isWebEnterDir = lib.__get__('isWebEnterDir')
 const isWebEnterDir4WebZip = lib.__get__('isWebEnterDir4WebZip')
+const getWebWEnters = lib.__get__('getWebWEnters')
 
 // webzip的样本目录
 const SAMPLE_WEBZIP_DIR = 'd:/Works/大嘴鸟/we-watch/药品专项检查/样本/pagedb/mednova/www.mednova.com.cn'
+
+// 样本页面数据目录
+const SAMPLE_PAGE_DB = 'd:/Works/大嘴鸟/we-watch/药品专项检查/样本/pagedb'
 
 describe('页面筛选器单元测试', function () {
 
@@ -23,6 +27,13 @@ describe('页面筛选器单元测试', function () {
         done()
     })
 
+    it('getWebWEnters',(done)=>{
+        let ary = getWebWEnters(SAMPLE_PAGE_DB)
+        expect(ary.length).to.equal(1)
+        expect(ary[0]).to.equal(SAMPLE_WEBZIP_DIR)
+
+        done()
+    })
 
     it('筛选器入口统一测试',async ()=>{
         beginFilter()
