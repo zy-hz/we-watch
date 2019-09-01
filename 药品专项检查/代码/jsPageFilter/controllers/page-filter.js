@@ -7,9 +7,9 @@ const HTML_PAGE_DB = 'd:/Works/大嘴鸟/we-watch/药品专项检查/样本/page
 
 var fn_main = async (ctx, next) => {
     let name = ctx.params.name || ''
-    beginFilter(name)
+    let result = beginFilter(name)
 
-    ctx.response.body = `<h1>page-filter, ${name}!</h1>`
+    ctx.response.body = result
 }
 
 // 开始筛选
@@ -26,7 +26,6 @@ function beginFilter(name = '') {
         if (matchInfo.length > 0) return matchInfo
     })
 
-    console.log(ary)
     return ary
 }
 
