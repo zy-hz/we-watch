@@ -14,9 +14,59 @@ var fn_main = async (ctx, next) => {
 
 // 开始筛选
 function beginFilter(name = '') {
+    // 载入词库
     let words = loadWords(name)
+    // 获得本地web网站的数据库入口
     let webEnters = getWebWEnters(HTML_PAGE_DB)
 
+    // 检查比配关键词的网站
+    let ary = _.map(webEnters, (webDir) => {
+        let matchInfo = getMatchHtmlPages(webDir, words)
+        if (matchInfo.length > 0) return matchInfo
+    })
+
+    console.log(ary)
+    return ary
+}
+
+// 获得匹配的页面
+function getMatchHtmlPages(webDir, words) {
+    let pages = []
+
+    let files = fs.readdirSync(webDir)
+    _.forEach(files, (f) => {
+
+        let fileName = `${webDir}/${f}`
+
+        // 如果是目录，递归找目录下的文件
+        if (fs.statSync(fileName).isDirectory()) {
+            pages = _.concat(pages, getMatchHtmlPages(fileName, words))
+        }
+        else if (f.endsWith('.html')) {
+            // 如果是html文件，就匹配文件
+            let htmlPage = fs.readFileSync(fileName, 'utf-8')
+            let info = getMatchInfoFromPage(htmlPage, words)
+            if (info != null) pages = _.concat(pages, info)
+        }
+
+    })
+
+    return pages
+}
+
+// 从文件中检查是否匹配的关键词
+function getMatchInfoFromPage(page, words) {
+    
+    words = _.concat(words,'数字X光机')
+
+    let matchWords = _.filter(words, (w) => {
+        return page.indexOf(w) >= 0
+    })
+
+    if(matchWords.length === 0) return null
+
+    // 合成匹配的信息
+    return _.join(matchWords)
 }
 
 // 载入词表
@@ -47,11 +97,11 @@ function getWebWEnters(root_dir) {
         if (fs.statSync(subDir).isDirectory()) {
             // 是否为web入口的目录
             if (isWebEnterDir(subDir)) {
-                array = _.concat(array,subDir)
+                array = _.concat(array, subDir)
             }
             else {
                 // 继续发现子目录
-                array = _.concat(array,getWebWEnters(subDir))
+                array = _.concat(array, getWebWEnters(subDir))
             }
         }
     })
@@ -67,11 +117,11 @@ function isWebEnterDir(dir_name) {
 // webzip格式的网站入口
 function isWebEnterDir4WebZip(dir_name) {
     // 目录必须存在
-    if(!fs.existsSync(dir_name)) return false
+    if (!fs.existsSync(dir_name)) return false
 
     // 获得目录下的所有文件
     let files = fs.readdirSync(dir_name)
-    let htmlFiles = _.filter(files,(f)=>{
+    let htmlFiles = _.filter(files, (f) => {
         return f.endsWith('.html')
     })
 
