@@ -21,7 +21,8 @@ function beginFilter(name = '') {
 
     // 检查比配关键词的网站
     let ary = _.map(webEnters, (webDir) => {
-        let matchInfo = getMatchHtmlPages(webDir, words)
+        let webInfo = getWebInfo(webDir)
+        let matchInfo = getMatchHtmlPages(webDir, words, webInfo)
         if (matchInfo.length > 0) return matchInfo
     })
 
@@ -29,24 +30,34 @@ function beginFilter(name = '') {
     return ary
 }
 
+// 获得web的信息
+function getWebInfo(web_dir) {
+    let webRoot = path.basename(web_dir)
+    return { webRoot, webUrl: web_dir }
+}
+
 // 获得匹配的页面
-function getMatchHtmlPages(webDir, words) {
+function getMatchHtmlPages(web_dir, words, web_info) {
     let pages = []
 
-    let files = fs.readdirSync(webDir)
+    let files = fs.readdirSync(web_dir)
     _.forEach(files, (f) => {
 
-        let fileName = `${webDir}/${f}`
+        let fileName = `${web_dir}/${f}`
 
         // 如果是目录，递归找目录下的文件
         if (fs.statSync(fileName).isDirectory()) {
-            pages = _.concat(pages, getMatchHtmlPages(fileName, words))
+            pages = _.concat(pages, getMatchHtmlPages(fileName, words, web_info))
         }
         else if (f.endsWith('.html')) {
             // 如果是html文件，就匹配文件
             let htmlPage = fs.readFileSync(fileName, 'utf-8')
-            let info = getMatchInfoFromPage(htmlPage, words)
-            if (info != null) pages = _.concat(pages, info)
+            // 获得匹配的关键词
+            let matchWords = getMatchKeywords(htmlPage, words)
+            if (matchWords.length > 0) {
+                pages = _.concat(pages, buildMatchPageInfo(web_info, matchWords, fileName))
+            }
+
         }
 
     })
@@ -54,19 +65,26 @@ function getMatchHtmlPages(webDir, words) {
     return pages
 }
 
+// 构建匹配的页面信息
+function buildMatchPageInfo(web_info, match_words, file_url) {
+    let pageUrl = _.replace(file_url, web_info.webUrl, web_info.webRoot)
+    return {
+        webRoot: web_info.webRoot,
+        pageUrl,
+        matchWords: _.join(match_words)
+    }
+}
+
 // 从文件中检查是否匹配的关键词
-function getMatchInfoFromPage(page, words) {
-    
-    words = _.concat(words,'数字X光机')
+function getMatchKeywords(page, words) {
+
+    words = _.concat(words, '数字X光机')
 
     let matchWords = _.filter(words, (w) => {
         return page.indexOf(w) >= 0
     })
 
-    if(matchWords.length === 0) return null
-
-    // 合成匹配的信息
-    return _.join(matchWords)
+    return matchWords
 }
 
 // 载入词表
