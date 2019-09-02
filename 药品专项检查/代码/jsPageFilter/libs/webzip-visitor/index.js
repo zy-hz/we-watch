@@ -50,12 +50,12 @@ function formatSourceUrl(src, tag) {
 
     if (tag.indexOf(lastPm) == 0) {
         // 目标和最后一个参数相同
-        return { src, tag: src + '/' + tag }
+        return { src, tag: src.slice(0, idx) + '/' + tag }
     }
     else {
         // todo::处理api的访问
         // api.php?op=count&id=65&modelid=1
-        return { src, tag }
+        return { src, tag: src.slice(0, idx) + '/' + tag }
     }
 }
 

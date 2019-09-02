@@ -61,7 +61,16 @@ function getMatchHtmlPages(web_dir, words, web_info) {
 // 构建匹配的页面信息
 function buildMatchPageInfo(web_info, match_words, file_url) {
     let pageUrl = _.replace(file_url, web_info.siteDir, web_info.rootUrl)
-    let urlMap = _.find(web_info.renameUrls, { 'tag': pageUrl })
+    // 去中文字符
+    pageUrl = pageUrl.replace(/[^\x00-\xff]/mg, "")
+    let urlMap = _.find(web_info.renameUrls, (x) => {
+        x = x || {}
+        let tag = x.tag || ''
+        tag = tag.replace(/[^\x00-\xff]./mg, "")
+
+        return tag === pageUrl
+    })
+
     if (!_.isUndefined(urlMap))
         pageUrl = urlMap.src
 
