@@ -10,7 +10,6 @@ const HTML_PAGE_DB = 'd:/Works/大嘴鸟/we-watch/药品专项检查/样本/page
 // webzip目录的访问器
 const wzVisitor = new  WZVisitor(HTML_PAGE_DB)
 
-
 var fn_main = async (ctx, next) => {
     let name = ctx.params.name || ''
     let result = beginFilter(name)
@@ -23,12 +22,12 @@ function beginFilter(name = '') {
     // 载入词库
     let words = loadWords(name)
     // 获得本地web网站的数据库入口
-    let webEnters = wzVisitor.getAllWebSites()
+    let webSites = wzVisitor.getAllWebSites()
 
     // 检查比配关键词的网站
-    let ary = _.map(webEnters, (webDir) => {
-        let webInfo = getWebInfo(webDir)
-        let pageInfo = getMatchHtmlPages(webDir, words, webInfo)
+    let ary = _.map(webSites, (site) => {
+        let webInfo = getWebInfo(site)
+        let pageInfo = getMatchHtmlPages(site, words, webInfo)
         return buildMathWebInfo(webInfo,pageInfo)
     })
 

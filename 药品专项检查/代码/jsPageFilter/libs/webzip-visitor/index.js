@@ -44,5 +44,10 @@ module.exports = class WebZipVisitor {
     getAllWebSites(){
         return findWebs(this.rootDir)
     }
+
+    // 循环过滤每一个页面
+    forEachPage(web_site){
+
+    }
 } 
 
