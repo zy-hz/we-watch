@@ -17,7 +17,8 @@
             "program": "${workspaceRoot}/node_modules/mocha/bin/_mocha",
             "stopOnEntry": false,
             "args": [
-                "test/page-filter.test.js",
+                //"test/page-filter.test.js",
+                "libs/webzip-visitor/test",
                 "--no-timeouts",
                 "--recursive"
             ],
