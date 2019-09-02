@@ -10,6 +10,9 @@ const SAMPLE_WEBZIP_DIR = 'd:/Works/大嘴鸟/we-watch/药品专项检查/样本
 // 样本页面数据目录
 const SAMPLE_PAGE_DB = 'd:/Works/大嘴鸟/we-watch/药品专项检查/样本/pagedb'
 
+const WZVisitor = require('../index.js')
+const wzVisitor = new  WZVisitor(SAMPLE_PAGE_DB)
+
 describe('webzip访问器单元测试', function () {
 
     it('isWebZipDir', (done) => {
@@ -28,4 +31,13 @@ describe('webzip访问器单元测试', function () {
         done()
     })
 
+})
+
+describe('webzip类测试',function(){
+    it('forEachPage',(done)=>{
+        wzVisitor.forEachPage(SAMPLE_WEBZIP_DIR,(x)=>{
+            console.log(x)
+        })
+        done()
+    })
 })

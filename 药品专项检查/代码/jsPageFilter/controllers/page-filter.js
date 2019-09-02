@@ -8,7 +8,7 @@ const WORD_LIB_FILE = 'd:/Works/大嘴鸟/we-watch/药品专项检查/样本/处
 const HTML_PAGE_DB = 'd:/Works/大嘴鸟/we-watch/药品专项检查/样本/pagedb'
 
 // webzip目录的访问器
-const wzVisitor = new  WZVisitor(HTML_PAGE_DB)
+const wzVisitor = new WZVisitor(HTML_PAGE_DB)
 
 var fn_main = async (ctx, next) => {
     let name = ctx.params.name || ''
@@ -28,19 +28,19 @@ function beginFilter(name = '') {
     let ary = _.map(webSites, (site) => {
         let webInfo = getWebInfo(site)
         let pageInfo = getMatchHtmlPages(site, words, webInfo)
-        return buildMathWebInfo(webInfo,pageInfo)
+        return buildMathWebInfo(webInfo, pageInfo)
     })
 
     return ary
 }
 
 // 构建匹配的网站信息
-function buildMathWebInfo(web_info,page_info){
+function buildMathWebInfo(web_info, page_info) {
     page_info = page_info || []
     return {
-        webRoot:web_info.webRoot,
-        matchPageCount:page_info.length,
-        matchPages:page_info
+        webRoot: web_info.webRoot,
+        matchPageCount: page_info.length,
+        matchPages: page_info
     }
 }
 
@@ -52,28 +52,13 @@ function getWebInfo(web_dir) {
 
 // 获得匹配的页面
 function getMatchHtmlPages(web_dir, words, web_info) {
-    let pages = []
 
-    let files = fs.readdirSync(web_dir)
-    _.forEach(files, (f) => {
+    let pages = wzVisitor.forEachPage(web_dir, (x) => {
 
-        let fileName = `${web_dir}/${f}`
-
-        // 如果是目录，递归找目录下的文件
-        if (fs.statSync(fileName).isDirectory()) {
-            pages = _.concat(pages, getMatchHtmlPages(fileName, words, web_info))
-        }
-        else if (f.endsWith('.html')) {
-            // 如果是html文件，就匹配文件
-            let htmlPage = fs.readFileSync(fileName, 'utf-8')
-            // 获得匹配的关键词
-            let matchWords = getMatchKeywords(htmlPage, words)
-            if (matchWords.length > 0) {
-                pages = _.concat(pages, buildMatchPageInfo(web_info, matchWords, fileName))
-            }
-
-        }
-
+        // 获得匹配的关键词
+        let matchWords = getMatchKeywords(x.pageContent, words)
+        if (matchWords != null && matchWords.length > 0)
+            return buildMatchPageInfo(web_info, matchWords, x.pageFileName)
     })
 
     return pages

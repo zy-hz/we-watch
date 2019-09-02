@@ -41,13 +41,41 @@ module.exports = class WebZipVisitor {
     }
 
     // 获得所有的web站点
-    getAllWebSites(){
+    getAllWebSites() {
         return findWebs(this.rootDir)
     }
 
     // 循环过滤每一个页面
-    forEachPage(web_site){
+    forEachPage(web_dir, fn) {
+        let pages = []
 
+        let files = fs.readdirSync(web_dir)
+        _.forEach(files, (f) => {
+
+            let fileName = `${web_dir}/${f}`
+
+            // 如果是目录，递归找目录下的文件
+            if (fs.statSync(fileName).isDirectory()) {
+                pages = _.concat(pages, this.forEachPage(fileName, fn))
+            }
+            else if (f.endsWith('.html')) {
+                // 如果是html文件，就匹配文件
+                let htmlPage = fs.readFileSync(fileName, 'utf-8')
+
+                // 
+                let result = fn({
+                    rootDir: this.rootDir,
+                    pageDir: web_dir,
+                    pageFileName: fileName,
+                    pageContent: htmlPage
+                })
+                if (result != null) pages = _.concat(pages, result)
+
+            }
+
+        })
+
+        return pages
     }
-} 
+}
 
