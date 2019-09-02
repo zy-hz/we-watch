@@ -3,7 +3,9 @@ const path = require('path')
 const _ = require('lodash')
 
 const WORD_LIB_FILE = 'd:/Works/大嘴鸟/we-watch/药品专项检查/样本/处方药清单_20190829.txt'
-const HTML_PAGE_DB = 'd:/Works/大嘴鸟/we-watch/药品专项检查/样本/pagedb'
+const HTML_PAGE_DB = 'd:/Works/大嘴鸟/we-watch/药品专项检查/data'
+//const HTML_PAGE_DB = 'd:/Works/大嘴鸟/we-watch/药品专项检查/样本/pagedb'
+
 
 var fn_main = async (ctx, next) => {
     let name = ctx.params.name || ''
@@ -22,11 +24,21 @@ function beginFilter(name = '') {
     // 检查比配关键词的网站
     let ary = _.map(webEnters, (webDir) => {
         let webInfo = getWebInfo(webDir)
-        let matchInfo = getMatchHtmlPages(webDir, words, webInfo)
-        if (matchInfo.length > 0) return matchInfo
+        let pageInfo = getMatchHtmlPages(webDir, words, webInfo)
+        return buildMathWebInfo(webInfo,pageInfo)
     })
 
     return ary
+}
+
+// 构建匹配的网站信息
+function buildMathWebInfo(web_info,page_info){
+    page_info = page_info || []
+    return {
+        webRoot:web_info.webRoot,
+        matchPageCount:page_info.length,
+        matchPages:page_info
+    }
 }
 
 // 获得web的信息
@@ -68,7 +80,7 @@ function getMatchHtmlPages(web_dir, words, web_info) {
 function buildMatchPageInfo(web_info, match_words, file_url) {
     let pageUrl = _.replace(file_url, web_info.webUrl, web_info.webRoot)
     return {
-        webRoot: web_info.webRoot,
+        //webRoot: web_info.webRoot,
         pageUrl,
         matchWords: _.join(match_words)
     }
@@ -76,8 +88,6 @@ function buildMatchPageInfo(web_info, match_words, file_url) {
 
 // 从文件中检查是否匹配的关键词
 function getMatchKeywords(page, words) {
-
-    words = _.concat(words, '数字X光机')
 
     let matchWords = _.filter(words, (w) => {
         return page.indexOf(w) >= 0
@@ -136,14 +146,8 @@ function isWebEnterDir4WebZip(dir_name) {
     // 目录必须存在
     if (!fs.existsSync(dir_name)) return false
 
-    // 获得目录下的所有文件
-    let files = fs.readdirSync(dir_name)
-    let htmlFiles = _.filter(files, (f) => {
-        return f.endsWith('.html')
-    })
-
-    // 只有一个html文件
-    return htmlFiles.length === 1
+    let baseName = path.basename(dir_name)
+    return /.*?\..*?/m.test(baseName)
 }
 
 module.exports = {

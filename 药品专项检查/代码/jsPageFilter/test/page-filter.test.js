@@ -31,8 +31,8 @@ describe('页面筛选器单元测试', function () {
 
     it('getWebWEnters', (done) => {
         let ary = getWebWEnters(SAMPLE_PAGE_DB)
-        expect(ary.length).to.equal(1)
-        expect(ary[0]).to.equal(SAMPLE_WEBZIP_DIR)
+        expect(ary.length).to.equal(2)
+        expect(ary[1]).to.equal(SAMPLE_WEBZIP_DIR)
 
         done()
     })
