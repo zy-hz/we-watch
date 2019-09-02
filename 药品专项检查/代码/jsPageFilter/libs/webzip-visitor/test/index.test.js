@@ -34,10 +34,18 @@ describe('webzip访问器单元测试', function () {
 })
 
 describe('webzip类测试',function(){
+    it('getWebSiteInfo',(done)=>{
+        let info = wzVisitor.getWebSiteInfo(SAMPLE_WEBZIP_DIR)
+        console.log(info)
+        done()
+    })
+
     it('forEachPage',(done)=>{
         wzVisitor.forEachPage(SAMPLE_WEBZIP_DIR,(x)=>{
-            console.log(x)
+ 
         })
         done()
     })
+
+
 })

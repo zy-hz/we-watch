@@ -4,8 +4,8 @@ const _ = require('lodash')
 const WZVisitor = require('../libs/webzip-visitor')
 
 const WORD_LIB_FILE = 'd:/Works/大嘴鸟/we-watch/药品专项检查/样本/处方药清单_20190829.txt'
-//const HTML_PAGE_DB = 'd:/Works/大嘴鸟/we-watch/药品专项检查/data'
-const HTML_PAGE_DB = 'd:/Works/大嘴鸟/we-watch/药品专项检查/样本/pagedb'
+const HTML_PAGE_DB = 'd:/Works/大嘴鸟/we-watch/药品专项检查/data'
+//const HTML_PAGE_DB = 'd:/Works/大嘴鸟/we-watch/药品专项检查/样本/pagedb'
 
 // webzip目录的访问器
 const wzVisitor = new WZVisitor(HTML_PAGE_DB)
@@ -26,7 +26,7 @@ function beginFilter(name = '') {
 
     // 检查比配关键词的网站
     let ary = _.map(webSites, (site) => {
-        let webInfo = getWebInfo(site)
+        let webInfo = wzVisitor.getWebSiteInfo(site)
         let pageInfo = getMatchHtmlPages(site, words, webInfo)
         return buildMathWebInfo(webInfo, pageInfo)
     })
@@ -38,16 +38,10 @@ function beginFilter(name = '') {
 function buildMathWebInfo(web_info, page_info) {
     page_info = page_info || []
     return {
-        webRoot: web_info.webRoot,
+        rootUrl: web_info.rootUrl,
         matchPageCount: page_info.length,
         matchPages: page_info
     }
-}
-
-// 获得web的信息
-function getWebInfo(web_dir) {
-    let webRoot = path.basename(web_dir)
-    return { webRoot, webUrl: web_dir }
 }
 
 // 获得匹配的页面
@@ -66,9 +60,12 @@ function getMatchHtmlPages(web_dir, words, web_info) {
 
 // 构建匹配的页面信息
 function buildMatchPageInfo(web_info, match_words, file_url) {
-    let pageUrl = _.replace(file_url, web_info.webUrl, web_info.webRoot)
+    let pageUrl = _.replace(file_url, web_info.siteDir, web_info.rootUrl)
+    let urlMap = _.find(web_info.renameUrls, { 'tag': pageUrl })
+    if (!_.isUndefined(urlMap))
+        pageUrl = urlMap.src
+
     return {
-        //webRoot: web_info.webRoot,
         pageUrl,
         matchWords: _.join(match_words)
     }
