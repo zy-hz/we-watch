@@ -116,12 +116,13 @@ module.exports = class WebZipVisitor {
 
     // 获得公司名称
     getCompanyNameByRootUrl(root_url) {
-        let companyName = _.find(this.webConfigs, { 'rootUrl': root_url })
-        if (!_.isNil(companyName)) return companyName
+        let cfg = _.find(this.webConfigs, { 'rootUrl': root_url })
+        if (!_.isNil(cfg)) return cfg.companyName
 
         // 处理连接
         root_url = _.startsWith(root_url, 'www.') ? root_url.substring(4) : 'www.' + root_url
-        return _.find(this.webConfigs, { 'rootUrl': root_url })
+        cfg = _.find(this.webConfigs, { 'rootUrl': root_url })
+        return _.isNil(cfg) ? '' : cfg.companyName
     }
 
     // 循环过滤每一个页面

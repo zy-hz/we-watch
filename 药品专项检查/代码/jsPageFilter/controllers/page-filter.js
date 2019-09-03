@@ -4,8 +4,8 @@ const _ = require('lodash')
 const WZVisitor = require('../libs/webzip-visitor')
 
 const WORD_LIB_FILE = 'd:/Works/大嘴鸟/we-watch/药品专项检查/样本/处方药清单_20190829.txt'
-const HTML_PAGE_DB = 'd:/Works/大嘴鸟/we-watch/药品专项检查/data'
-//const HTML_PAGE_DB = 'd:/Works/大嘴鸟/we-watch/药品专项检查/样本/pagedb'
+//const HTML_PAGE_DB = 'd:/Works/大嘴鸟/we-watch/药品专项检查/data'
+const HTML_PAGE_DB = 'd:/Works/大嘴鸟/we-watch/药品专项检查/样本/pagedb'
 
 // webzip目录的访问器
 const wzVisitor = new WZVisitor(HTML_PAGE_DB)
@@ -38,6 +38,7 @@ function beginFilter(name = '') {
 function buildMathWebInfo(web_info, page_info) {
     page_info = page_info || []
     return {
+        companyName:web_info.companyName,
         rootUrl: web_info.rootUrl,
         matchPageCount: page_info.length,
         matchPages: page_info
