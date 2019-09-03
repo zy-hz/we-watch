@@ -4,6 +4,7 @@ const lib = require("rewire")('../index.js')
 const isWebZipDir = lib.__get__('isWebZipDir')
 const findWebs = lib.__get__('findWebs')
 const getRenameUrlMap = lib.__get__('getRenameUrlMap')
+const readWebConfigs = lib.__get__('readWebConfigs')
 
 // webzip的样本目录
 const SAMPLE_WEBZIP_DIR = 'd:/Works/大嘴鸟/we-watch/药品专项检查/样本/pagedb/mednova/www.mednova.com.cn'
@@ -12,7 +13,7 @@ const SAMPLE_WEBZIP_DIR = 'd:/Works/大嘴鸟/we-watch/药品专项检查/样本
 const SAMPLE_PAGE_DB = 'd:/Works/大嘴鸟/we-watch/药品专项检查/样本/pagedb'
 
 const WZVisitor = require('../index.js')
-const wzVisitor = new  WZVisitor(SAMPLE_PAGE_DB)
+const wzVisitor = new WZVisitor(SAMPLE_PAGE_DB)
 
 describe('webzip访问器单元测试', function () {
 
@@ -32,28 +33,35 @@ describe('webzip访问器单元测试', function () {
         done()
     })
 
-    it('getRenameUrlMap',(done)=>{
+    it('getRenameUrlMap', (done) => {
         let urlMap = getRenameUrlMap('http://www.dxycare.com/page/15	15.html')
-        expect(urlMap).to.deep.equal({src:'www.dxycare.com/page/15',tag:'www.dxycare.com/page/15.html'})
+        expect(urlMap).to.deep.equal({ src: 'www.dxycare.com/page/15', tag: 'www.dxycare.com/page/15.html' })
 
         urlMap = getRenameUrlMap('http://www.hljkkj.com/Birth/Detail?type=Jkzx_a&id=325	Detail¿type=Jkzx_a&id=325.html')
-        expect(urlMap).to.deep.equal({src:'www.hljkkj.com/Birth/Detail?type=Jkzx_a&id=325',tag:'www.hljkkj.com/Birth/Detail¿type=Jkzx_a&id=325.html'})
+        expect(urlMap).to.deep.equal({ src: 'www.hljkkj.com/Birth/Detail?type=Jkzx_a&id=325', tag: 'www.hljkkj.com/Birth/Detail¿type=Jkzx_a&id=325.html' })
 
+        done()
+    })
+
+    it('readWebConfigs', (done) => {
+        let cfg = readWebConfigs(SAMPLE_PAGE_DB)
+        expect(cfg, '不能为空').is.not.null
+        expect(cfg.length).to.be.eq(25)
         done()
     })
 
 })
 
-describe('webzip类测试',function(){
-    it('getWebSiteInfo',(done)=>{
+describe('webzip类测试', function () {
+    it('getWebSiteInfo', (done) => {
         let info = wzVisitor.getWebSiteInfo(SAMPLE_WEBZIP_DIR)
 
         done()
     })
 
-    it('forEachPage',(done)=>{
-        wzVisitor.forEachPage(SAMPLE_WEBZIP_DIR,(x)=>{
- 
+    it('forEachPage', (done) => {
+        wzVisitor.forEachPage(SAMPLE_WEBZIP_DIR, (x) => {
+
         })
         done()
     })

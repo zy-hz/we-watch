@@ -35,6 +35,20 @@ function findWebs(root_dir) {
     return array
 }
 
+// 读取所有网站的统一配置
+function readWebConfigs(root_dir) {
+    let cfgFileName = `${root_dir}/webconfig.txt`
+    let cfgContent = fs.readFileSync(cfgFileName, 'utf-8')
+    let lines = _.split(cfgContent,'\r\n')
+
+    return _.map(lines, (line) => {
+        let pms = _.split(line, '\t')
+        if (pms.length === 2) {
+            return { companyName: pms[0], rootUrl: pms[1] }
+        }
+    })
+}
+
 // 格式化来源url
 function formatSourceUrl(src, tag) {
     // 去http头
@@ -88,7 +102,8 @@ module.exports = class WebZipVisitor {
 
     // 获得所有的web站点
     getAllWebSites() {
-        return findWebs(this.rootDir)
+        let webs = findWebs(this.rootDir)
+        return webs
     }
 
     // 获得web的信息
