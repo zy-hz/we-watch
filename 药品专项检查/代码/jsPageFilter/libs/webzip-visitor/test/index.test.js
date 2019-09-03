@@ -66,5 +66,8 @@ describe('webzip类测试', function () {
         done()
     })
 
-
+    it('getAllWebSites',(done)=>{
+        wzVisitor.getAllWebSites()
+        done()
+    })
 })

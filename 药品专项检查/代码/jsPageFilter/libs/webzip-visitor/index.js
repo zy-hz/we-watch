@@ -39,7 +39,7 @@ function findWebs(root_dir) {
 function readWebConfigs(root_dir) {
     let cfgFileName = `${root_dir}/webconfig.txt`
     let cfgContent = fs.readFileSync(cfgFileName, 'utf-8')
-    let lines = _.split(cfgContent,'\r\n')
+    let lines = _.split(cfgContent, '\r\n')
 
     return _.map(lines, (line) => {
         let pms = _.split(line, '\t')
@@ -98,19 +98,30 @@ function getRenameUrls(site_dir) {
 module.exports = class WebZipVisitor {
     constructor(root_dir) {
         this.rootDir = root_dir
+        this.webConfigs = readWebConfigs(root_dir)
     }
 
     // 获得所有的web站点
     getAllWebSites() {
-        let webs = findWebs(this.rootDir)
-        return webs
+        return findWebs(this.rootDir)
     }
 
     // 获得web的信息
     getWebSiteInfo(site_dir) {
         let rootUrl = path.basename(site_dir)
         let renameUrls = getRenameUrls(site_dir)
-        return { rootUrl, siteDir: site_dir, renameUrls }
+        let companyName = this.getCompanyNameByRootUrl(rootUrl)
+        return { rootUrl, siteDir: site_dir, renameUrls, companyName }
+    }
+
+    // 获得公司名称
+    getCompanyNameByRootUrl(root_url) {
+        let companyName = _.find(this.webConfigs, { 'rootUrl': root_url })
+        if (!_.isNil(companyName)) return companyName
+
+        // 处理连接
+        root_url = _.startsWith(root_url, 'www.') ? root_url.substring(4) : 'www.' + root_url
+        return _.find(this.webConfigs, { 'rootUrl': root_url })
     }
 
     // 循环过滤每一个页面
