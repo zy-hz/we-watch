@@ -4,8 +4,8 @@ const _ = require('lodash')
 const WZVisitor = require('../libs/webzip-visitor')
 
 const WORD_LIB_FILE = 'd:/Works/大嘴鸟/we-watch/药品专项检查/样本/处方药清单_20190829.txt'
-//const HTML_PAGE_DB = 'd:/Works/大嘴鸟/we-watch/药品专项检查/data'
-const HTML_PAGE_DB = 'd:/Works/大嘴鸟/we-watch/药品专项检查/样本/pagedb'
+const HTML_PAGE_DB = 'd:/Works/大嘴鸟/we-watch/药品专项检查/data'
+//const HTML_PAGE_DB = 'd:/Works/大嘴鸟/we-watch/药品专项检查/样本/pagedb'
 
 // webzip目录的访问器
 const wzVisitor = new WZVisitor(HTML_PAGE_DB)
@@ -28,17 +28,21 @@ function beginFilter(name = '') {
     let ary = _.map(webSites, (site) => {
         let webInfo = wzVisitor.getWebSiteInfo(site)
         let pageInfo = getMatchHtmlPages(site, words, webInfo)
-        return buildMathWebInfo(webInfo, pageInfo)
+
+        // 如果没有发现匹配的页面，就不输出
+        if (!_.isNil(pageInfo) && !_.isEmpty(pageInfo))
+            return buildMathWebInfo(webInfo, pageInfo)
     })
 
-    return ary
+    return _.filter(ary, (x) => { return !_.isNil(x) })
 }
 
 // 构建匹配的网站信息
 function buildMathWebInfo(web_info, page_info) {
+    // 数组去重
     page_info = page_info || []
     return {
-        companyName:web_info.companyName,
+        companyName: web_info.companyName,
         rootUrl: web_info.rootUrl,
         matchPageCount: page_info.length,
         matchPages: page_info
@@ -52,8 +56,11 @@ function getMatchHtmlPages(web_dir, words, web_info) {
 
         // 获得匹配的关键词
         let matchWords = getMatchKeywords(x.pageContent, words)
-        if (matchWords != null && matchWords.length > 0)
-            return buildMatchPageInfo(web_info, matchWords, x.pageFileName)
+        // 去掉重复的关键词
+        matchWords = _.uniq(matchWords || [])
+
+        // 构建匹配的页面
+        if (!_.isEmpty(matchWords)) return buildMatchPageInfo(web_info, matchWords, x.pageFileName)
     })
 
     return pages
